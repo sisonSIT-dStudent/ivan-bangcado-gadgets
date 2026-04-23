@@ -90,6 +90,16 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isImageLoading, setIsImageLoading] = useState(true);
 
+  // NEW: Pre-load all media for the selected item so flipping is instant
+  useEffect(() => {
+    if (selectedItem && selectedItem.media) {
+      selectedItem.media.forEach((item) => {
+        const img = new Image();
+        img.src = item.url;
+      });
+    }
+  }, [selectedItem]);
+
   const handleOpenModal = (item) => {
     setSelectedItem(item);
     setCurrentMediaIndex(0);
