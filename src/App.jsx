@@ -88,10 +88,12 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   const handleOpenModal = (item) => {
     setSelectedItem(item);
     setCurrentMediaIndex(0);
+    setIsImageLoading(true);
     document.body.style.overflow = 'hidden';
   };
 
@@ -102,11 +104,13 @@ export default function App() {
 
   const nextMedia = (e) => {
     e.stopPropagation();
+    setIsImageLoading(true);
     setCurrentMediaIndex((prev) => (prev + 1) % selectedItem.media.length);
   };
 
   const prevMedia = (e) => {
     e.stopPropagation();
+    setIsImageLoading(true);
     setCurrentMediaIndex((prev) => (prev - 1 + selectedItem.media.length) % selectedItem.media.length);
   };
 
@@ -181,36 +185,43 @@ export default function App() {
             onClick={handleCloseModal}
           >
             <div 
-              className="bg-zinc-900 border border-zinc-800 rounded-[2rem] max-w-5xl w-full max-h-[85vh] md:h-[550px] overflow-hidden relative shadow-2xl flex flex-col md:flex-row"
+              className="bg-zinc-900 border border-zinc-800 rounded-[2rem] max-w-5xl w-full max-h-[90vh] md:h-[550px] overflow-hidden relative shadow-2xl flex flex-col md:flex-row"
               onClick={(e) => e.stopPropagation()}
             >
               <button 
                 onClick={handleCloseModal} 
-                className="absolute top-4 right-4 z-50 bg-white text-black w-8 h-8 md:w-10 md:h-10 rounded-full font-black flex items-center justify-center hover:scale-110 transition-transform"
+                className="absolute top-4 right-4 z-50 bg-white text-black w-8 h-8 md:w-10 md:h-10 rounded-full font-black flex items-center justify-center hover:scale-110 transition-transform shadow-xl"
               >
                 ✕
               </button>
               
-              {/* IMAGE SECTION - ZOOMED TO CUT OUT MARGINS */}
-              <div className="bg-black flex items-center justify-center h-[45%] md:h-full md:w-[60%] relative shrink-0 border-b md:border-b-0 md:border-r border-zinc-800 overflow-hidden">
+              <div className="bg-black flex items-center justify-center h-[50%] md:h-full md:w-[55%] relative shrink-0 border-b md:border-b-0 md:border-r border-zinc-800 overflow-hidden">
+                <img 
+                  src={selectedItem.media[currentMediaIndex].url} 
+                  className="absolute inset-0 w-full h-full object-cover scale-[1.2] opacity-30 blur-xl"
+                  alt=""
+                />
+                
                 <img 
                   key={selectedItem.media[currentMediaIndex].url}
                   src={selectedItem.media[currentMediaIndex].url} 
-                  className="w-full h-full object-contain scale-[1.4] md:scale-[1.25] transition-transform duration-500" 
+                  onLoad={() => setIsImageLoading(false)}
+                  className={`relative z-10 w-full h-full object-cover scale-[1.2] transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`} 
                   alt="Product view"
                 />
+
                 {selectedItem.media.length > 1 && (
                   <>
-                    <button onClick={prevMedia} className="absolute left-3 bg-blue-600/90 text-white w-10 h-10 rounded-full flex items-center justify-center z-10 shadow-lg hover:bg-blue-500 transition-colors">←</button>
-                    <button onClick={nextMedia} className="absolute right-3 bg-blue-600/90 text-white w-10 h-10 rounded-full flex items-center justify-center z-10 shadow-lg hover:bg-blue-500 transition-colors">→</button>
+                    <button onClick={prevMedia} className="absolute left-3 bg-blue-600/90 text-white w-10 h-10 rounded-full flex items-center justify-center z-20 shadow-lg hover:bg-blue-500 transition-colors">←</button>
+                    <button onClick={nextMedia} className="absolute right-3 bg-blue-600/90 text-white w-10 h-10 rounded-full flex items-center justify-center z-20 shadow-lg hover:bg-blue-500 transition-colors">→</button>
                   </>
                 )}
               </div>
 
-              <div className="p-6 md:p-8 flex flex-col justify-between flex-grow bg-zinc-900 overflow-y-auto">
+              <div className="p-6 md:p-8 flex flex-col justify-between h-[50%] md:h-full flex-grow bg-zinc-900 overflow-y-auto">
                 <div className="space-y-4">
                   <h2 className="text-2xl md:text-4xl font-black uppercase text-white italic tracking-tighter leading-none">{selectedItem.model}</h2>
-                  <p className="text-zinc-400 text-xs leading-relaxed border-l-2 border-blue-600 pl-3">{selectedItem.description}</p>
+                  <p className="text-zinc-400 text-[11px] md:text-xs leading-relaxed border-l-2 border-blue-600 pl-3">{selectedItem.description}</p>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800">
@@ -224,7 +235,7 @@ export default function App() {
                   </div>
                 </div>
                 
-                <div className="pt-6 mt-6 border-t border-zinc-800/50">
+                <div className="pt-4 mt-4 border-t border-zinc-800/50">
                   <p className="text-3xl md:text-4xl font-black text-blue-500 tracking-tighter mb-4">₱{selectedItem.price.toLocaleString()}</p>
                   <a 
                     href="https://www.facebook.com/profile.php?id=61585651144393" 
